@@ -12,12 +12,18 @@ classdef springmassController < handle
         z_d1
         z_dot
         beta
+        F_d1
         K
         kr
         ki
+        A
+        B
+        C
+        L
         limit
         integrator
         error_d1
+        x_hat
     end
     %----------------------------
     methods
@@ -35,46 +41,61 @@ classdef springmassController < handle
             self.limit = P.F_max;
             self.integrator = 0.0;
             self.error_d1 = 0.0;
+            self.A = P.A;
+            self.B = P.B;
+            self.C = P.C;
+            self.L = P.L;
+            self.x_hat = [0.0;0.0];
+            self.F_d1 = 0.0;
         end
         %----------------------------
         function F = u(self, y_r, y)
             % y_r is the referenced input
             % y is the current state
             z_r = y_r;
-            z = y(1);
-            self.differentiateZ(z);
             
-            error = z_r - z;
+            % updat the observer and extract z_hat
+            self.updateObserver(y);
+            z_hat = self.x_hat(1);
+            
+            % integrate error
+            error = z_r - z_hat;
             self.integrateError(error);
-            % Implement your controller here...
             
-            % You may choose to implement the PD control directly or call the
-            % PDControl class.  The PDControl class will return a force output
-            % for the given reference input and current state.
-            % i.e. for the z-controller (already set up in the constructor)
-            % call: z_force = self.zCtrl.PD(z_r, z, false);
-            % For the theta controller call:
-            %       theta_force = self.thetaCtrl.PD(theta_r, theta, false);
-            % You will need to determine what the output is for these
-            % controllers in relation to the block diagrams derived for the
-            % inner and outer loop control.
-            x = [z; self.z_dot];
-            F_unsat = -self.K*x - self.ki*self.integrator;
+            % compute equilibrium force F_e at old spot
+            z_hat = self.x_hat(1);
+            F_e = self.k*z_hat;
+            
+            % Compute the sate feedback controller
+            F_unsat = -self.K*self.x_hat - self.ki*self.integrator;
             
             % compute the total force
-            F = self.saturate(F_unsat);
-            self.integratorAntiWindup(F, F_unsat);
+            F = self.saturate(F_unsat + F_e);
+            self.updateForce(F);
+            
+            %self.integratorAntiWindup(F, F_unsat);
+        end
+        %----------------------------
+        function self = updateObserver(self, y_m)
+            % compute equilibrium torque tau_e at old angle
+            z_hat = self.x_hat(1);
+            F_e = self.k*z_hat;
+
+            N = 10;
+            for i=1:N
+                self.x_hat = self.x_hat + self.Ts/N*(...
+                    self.A*self.x_hat...
+                    + self.B*(self.F_d1-F_e)...
+                    + self.L*(y_m-self.C*self.x_hat));
+            end
+        end
+        %----------------------------
+        function self = updateTorque(self, F)
+            self.F_d1 = F;
         end
         %----------------------------
         function self = integratorAntiWindup(self, u_sat, u_unsat)
             self.integrator = self.integrator + self.Ts/self.ki*(u_sat - u_unsat);
-        end
-        %----------------------------
-        function self = differentiateZ(self, z)
-            self.z_dot = ...
-                self.beta*self.z_dot...
-                + (1-self.beta)*((z-self.z_d1) / self.Ts);
-            self.z_d1 = z;
         end
         %----------------------------
         function self = integrateError(self, error)
