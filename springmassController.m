@@ -10,7 +10,7 @@ classdef springmassController < handle
         b
         Ts
         z_d1
-        z_dot
+        %z_dot
         beta
         F_d1
         K
@@ -34,7 +34,7 @@ classdef springmassController < handle
             self.b = P.b;
             self.Ts = P.Ts;
             self.z_d1 = 0.0;
-            self.z_dot = P.zdot0;
+            %self.z_dot = P.zdot0;
             self.beta = P.beta;
             self.K = P.K;
             self.ki = P.ki;
@@ -64,7 +64,7 @@ classdef springmassController < handle
             
             % compute equilibrium force F_e at old spot
             z_hat = self.x_hat(1);
-            F_e = self.k*z_hat;
+            F_e = 0;
             
             % Compute the sate feedback controller
             F_unsat = -self.K*self.x_hat - self.ki*self.integrator;
@@ -79,7 +79,7 @@ classdef springmassController < handle
         function self = updateObserver(self, y_m)
             % compute equilibrium torque tau_e at old angle
             z_hat = self.x_hat(1);
-            F_e = self.k*z_hat;
+            F_e = 0;
 
             N = 10;
             for i=1:N
@@ -90,13 +90,13 @@ classdef springmassController < handle
             end
         end
         %----------------------------
-        function self = updateTorque(self, F)
+        function self = updateForce(self, F)
             self.F_d1 = F;
         end
         %----------------------------
-        function self = integratorAntiWindup(self, u_sat, u_unsat)
-            self.integrator = self.integrator + self.Ts/self.ki*(u_sat - u_unsat);
-        end
+%         function self = integratorAntiWindup(self, u_sat, u_unsat)
+%             self.integrator = self.integrator + self.Ts/self.ki*(u_sat - u_unsat);
+%         end
         %----------------------------
         function self = integrateError(self, error)
             self.integrator = self.integrator + (self.Ts/2.0)*(error+self.error_d1);

@@ -52,8 +52,8 @@ P.K = K1(1:2);
 P.ki = K1(3);
 
 % desired observer poles
-des_obsv_char_poly = [1,2*zeta*wn,wn^2];
-des_obsv_poles = roots(des_obsv_poles)';
+des_obsv_char_poly = [1,2*zeta*wn_z,wn_z^2];
+des_obsv_poles = roots(des_obsv_char_poly)';
 
 rank(obsv(P.A,P.C))
 P.L = place(P.A',P.C',des_obsv_poles)';

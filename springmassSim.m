@@ -1,5 +1,5 @@
 clear all
-springmassParamHW9;  % load parameters
+springmassParamHW10;  % load parameters
 
 % instantiate springmass, controller, and reference input classes 
 % Instantiate Dynamics class
@@ -7,12 +7,16 @@ springmass = springmassDynamics(P);
 ctrl = springmassController(P);  
 
 amplitude = .5; % amplitude of reference input
-frequency = .05; % frequency of reference input
+frequency = .02; % frequency of reference input
 reference = signalGenerator(amplitude, frequency);  
+
+% set disturbance input
+disturbance = 0.0; % 0.01;
 
 % instantiate the data plots and animation
 dataPlot = plotData(P);
 animation = springmassAnimation(P);
+% observerPlot = plotObserverData(P);
 
 % main simulation loop
 t = P.t_start;  % time starts at t_start
@@ -30,6 +34,7 @@ while t < P.t_end
     animation.drawSpringmass(springmass.states);
     springmass.states
     dataPlot.updatePlots(t, ref_input, springmass.states, u);
+%   observerPlot.updatePlots(t, springmass.states, ctrl.x_hat);
 end
 
 
