@@ -14,9 +14,9 @@ springmassParam % general ballbeam parameters
 
 % PD design for inner loop
 % calculate the kp and kd gains for theta here...
-Tr_z = 2;
+Tr_z = 1.5;
 wn_z = 2.2/Tr_z;
-zeta = .707;
+zeta = .99;
 integrator_pole = -5;
 
 % PD design

@@ -16,7 +16,7 @@ disturbance = 0.0; % 0.01;
 % instantiate the data plots and animation
 dataPlot = plotData(P);
 animation = springmassAnimation(P);
-% observerPlot = plotObserverData(P);
+observerPlot = plotObserverData(P);
 
 % main simulation loop
 t = P.t_start;  % time starts at t_start
@@ -34,7 +34,7 @@ while t < P.t_end
     animation.drawSpringmass(springmass.states);
     springmass.states
     dataPlot.updatePlots(t, ref_input, springmass.states, u);
-%   observerPlot.updatePlots(t, springmass.states, ctrl.x_hat);
+    observerPlot.updatePlots(t, springmass.states, ctrl.x_hat);
 end
 
 
