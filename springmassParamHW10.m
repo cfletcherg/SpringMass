@@ -55,5 +55,5 @@ P.ki = K1(3);
 des_obsv_char_poly = [1,2*zeta*wn_z,wn_z^2];
 des_obsv_poles = roots(des_obsv_char_poly)';
 
-rank(obsv(P.A,P.C))
+rank(obsv(P.A,P.C));
 P.L = place(P.A',P.C',des_obsv_poles)';

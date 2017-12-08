@@ -54,7 +54,7 @@ classdef springmassController < handle
             % y is the current state
             z_r = y_r;
             
-            % updat the observer and extract z_hat
+            % update the observer and extract z_hat
             self.updateObserver(y);
             z_hat = self.x_hat(1);
             
@@ -63,7 +63,6 @@ classdef springmassController < handle
             self.integrateError(error);
             
             % compute equilibrium force F_e at old spot
-            z_hat = self.x_hat(1);
             F_e = 0;
             
             % Compute the sate feedback controller
